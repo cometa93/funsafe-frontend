@@ -7,6 +7,9 @@ function NewsCard({ item }: { item: NewsItem }) {
   const Icon = item.icon;
   const content = (
     <>
+      <div className="news-card-image">
+        <img src={item.image} alt={item.imageAlt} loading="lazy" />
+      </div>
       <header>
         <span><Icon size={15} /> {item.label}</span>
         <time>{item.date}</time>
@@ -59,8 +62,8 @@ export function NewsPage() {
           <span className="kicker">SAFEFUN NEWSROOM</span>
           <h1>Product updates and signals shaping online safety.</h1>
           <p>
-            Follow what we ship, what we learn and the external events that make safer social
-            infrastructure an urgent product requirement.
+            Follow the AI/ML safety infrastructure we ship and the real-world signals that make
+            grooming detection, earlier intervention and accountable evidence essential.
           </p>
         </section>
 

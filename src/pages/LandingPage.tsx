@@ -1,14 +1,16 @@
 import {
   ArrowRight,
-  Braces,
+  BrainCircuit,
   Check,
   CircleDot,
   ExternalLink,
-  Flag,
   KeyRound,
-  Radio,
+  Layers3,
+  ScanSearch,
+  ShieldAlert,
   ShieldCheck,
-  UserRoundCheck
+  UserRoundCheck,
+  Workflow
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Brand } from '../components/Brand';
@@ -16,19 +18,19 @@ import { safetySignals } from '../data/news';
 
 const features = [
   {
-    icon: UserRoundCheck,
-    title: 'Identity that follows behavior',
-    copy: 'Map your user ID to a stable SafeFun identity without storing the raw identifier.'
+    icon: Workflow,
+    title: 'See behavior as a sequence',
+    copy: 'Connect conversations, sessions, identity changes, reports and access events into one behavioral timeline.'
   },
   {
-    icon: Flag,
-    title: 'Reports with useful context',
-    copy: 'Preserve the reported message and recent author history for a focused safety review.'
+    icon: BrainCircuit,
+    title: 'Detect grooming risk with specialized AI/ML',
+    copy: 'Look beyond banned words to signals such as trust building, secrecy, boundary testing and attempts to move contact elsewhere.'
   },
   {
-    icon: Braces,
-    title: 'Messages your product understands',
-    copy: 'Attach safe key/value metadata for items, guilds, profiles, PvP results, or your own concepts.'
+    icon: ShieldAlert,
+    title: 'Intervene with context',
+    copy: 'Give safety teams review-ready evidence and product controls for earlier, accountable action.'
   }
 ];
 
@@ -38,7 +40,7 @@ export function LandingPage() {
       <header className="site-nav shell">
         <Brand />
         <nav aria-label="Primary navigation">
-          <a href="#product">Product</a>
+          <a href="#product">Platform</a>
           <Link to="/news">News</Link>
           <a href="#safety">Safety</a>
           <Link to="/docs">Docs</Link>
@@ -54,60 +56,60 @@ export function LandingPage() {
       <main>
         <section className="hero shell">
           <div className="hero-copy">
-            <div className="eyebrow"><span className="pulse" /> AI-driven safety for games & apps</div>
-            <h1>Safe for margin.<span>Built for scale.</span></h1>
+            <div className="eyebrow"><span className="pulse" /> AI/ML safety infrastructure for online communities</div>
+            <h1>Detect grooming patterns.<span>Intervene before harm escalates.</span></h1>
             <p>
-              One API for realtime chat, Children Safety and Community Safety, with specialized
-              models and review-ready context designed for products that grow without making
-              protection an afterthought.
+              SafeFun is a safety intelligence layer for games, apps and social products.
+              Specialized AI/ML models connect conversations and behavior across sessions to
+              surface grooming and community risk, preserve evidence and help teams prevent
+              dangerous behavior from escalating into harm.
             </p>
             <div className="hero-actions">
               <Link className="button primary" to="/demo">
-                Launch Chat Tester <ArrowRight size={17} />
+                See the live foundation <ArrowRight size={17} />
               </Link>
               <Link className="button secondary" to="/docs">Read the API docs</Link>
             </div>
             <div className="hero-note">
-              <span><Check size={14} /> Unity 6000+</span>
-              <span><Check size={14} /> Web, desktop & mobile</span>
-              <span><Check size={14} /> Open message model</span>
+              <span><Check size={14} /> Children Safety</span>
+              <span><Check size={14} /> Community Safety</span>
+              <span><Check size={14} /> Built for games and apps</span>
             </div>
           </div>
 
-          <div className="hero-console" aria-label="SafeFun chat event example">
-            <div className="console-bar">
-              <div className="traffic-lights"><i /><i /><i /></div>
-              <span>live event stream</span>
-              <span className="connected"><CircleDot size={12} /> connected</span>
+          <div className="hero-safety-engine" aria-label="SafeFun AI behavior risk engine example">
+            <div className="engine-bar">
+              <span><BrainCircuit size={14} /> BEHAVIOR RISK ENGINE</span>
+              <span className="connected"><CircleDot size={12} /> LIVE ANALYSIS</span>
             </div>
-            <div className="console-context">
-              <span># guild:moonforge</span>
-              <div className="avatars"><b>AM</b><b>RK</b><b>+8</b></div>
+            <div className="engine-summary">
+              <div>
+                <small>SPECIALIZED MODEL</small>
+                <strong>Grooming pattern detection</strong>
+              </div>
+              <div className="risk-score"><span>RISK SIGNAL</span><strong>0.87</strong></div>
             </div>
-            <div className="chat-preview">
+            <div className="behavior-timeline">
               <article>
-                <div className="avatar lime">AM</div>
-                <div>
-                  <header><strong>AdaM</strong><time>20:41</time></header>
-                  <p>Anyone ready for the Ember Vault?</p>
-                </div>
+                <span>01</span>
+                <div><small>RELATIONSHIP SIGNAL</small><strong>Unusual trust-building frequency</strong></div>
+                <em>observed</em>
               </article>
               <article>
-                <div className="avatar violet">RK</div>
-                <div>
-                  <header><strong>RuneKeeper</strong><time>20:42</time></header>
-                  <div className="item-card">
-                    <div className="item-icon">✦</div>
-                    <span><small>SHARED ITEM</small><strong>Sunforged Pickaxe</strong></span>
-                    <em>LEGENDARY</em>
-                  </div>
-                </div>
+                <span>02</span>
+                <div><small>CONTEXT SIGNAL</small><strong>Repeated secrecy cues</strong></div>
+                <em>elevated</em>
+              </article>
+              <article>
+                <span>03</span>
+                <div><small>BOUNDARY SIGNAL</small><strong>Off-platform contact attempt</strong></div>
+                <em>high risk</em>
               </article>
             </div>
-            <div className="safety-event">
-              <ShieldCheck size={18} />
-              <span><strong>Safety context active</strong><small>Identity, access and report trail attached</small></span>
-              <code>24h</code>
+            <div className="engine-action">
+              <ScanSearch size={19} />
+              <span><strong>Safety review ready</strong><small>Cross-session context and evidence attached</small></span>
+              <code>ACT</code>
             </div>
           </div>
         </section>
@@ -117,8 +119,8 @@ export function LandingPage() {
             <span>SAFETY LAYER</span>
             <b><ShieldCheck size={18} /> Children Safety</b>
             <b><UserRoundCheck size={18} /> Community Safety</b>
-            <b><Radio size={18} /> AI-driven</b>
-            <b><Braces size={18} /> Specialized Models</b>
+            <b><BrainCircuit size={18} /> AI/ML Specialized Models</b>
+            <b><Layers3 size={18} /> Chat, UGC & Social Feeds</b>
           </div>
         </section>
 
@@ -126,16 +128,20 @@ export function LandingPage() {
           <div className="news-heading">
             <div>
               <span className="kicker">WHY THIS INFRASTRUCTURE MATTERS</span>
-              <h2>The safety gap is already visible.</h2>
+              <h2>Grooming is a pattern, not a keyword.</h2>
             </div>
             <p>
-              Recent reporting, research and legal claims show where identity, access, moderation
-              and evidence can break down as online communities grow.
+              Harm often develops across many interactions. Recent reporting and research show why
+              platforms need behavior-level detection, controlled access and evidence that survives
+              beyond a single message.
             </p>
           </div>
           <div className="news-grid">
-            {safetySignals.map(({ source, date, label, icon: Icon, title, summary, response, href }) => (
+            {safetySignals.map(({ source, date, label, icon: Icon, title, summary, response, href, image, imageAlt }) => (
               <article key={href}>
+                <div className="news-card-image">
+                  <img src={image} alt={imageAlt} loading="lazy" />
+                </div>
                 <header>
                   <span><Icon size={15} /> {label}</span>
                   <time>{date}</time>
@@ -166,9 +172,9 @@ export function LandingPage() {
 
         <section className="product-section shell" id="product">
           <div className="section-heading">
-            <span className="kicker">CHAT, FIRST</span>
-            <h2>A small integration surface.<br />A serious operational foundation.</h2>
-            <p>Start with chat today. Keep the same product, identity and safety model as your social layer grows.</p>
+            <span className="kicker">THE SAFETY INTELLIGENCE LAYER</span>
+            <h2>From scattered activity<br />to an actionable safety signal.</h2>
+            <p>Connect your product once. SafeFun turns communication and behavioral context into earlier risk detection, focused review and defensible action.</p>
           </div>
           <div className="feature-grid">
             {features.map(({ icon: Icon, title, copy }, index) => (
@@ -185,17 +191,17 @@ export function LandingPage() {
         <section className="integration-section" id="safety">
           <div className="shell integration-grid">
             <div>
-              <span className="kicker">SERVER-AUTHORITATIVE</span>
-              <h2>Your backend decides who the user is and where they belong.</h2>
+              <span className="kicker">IDENTITY MAKES AI/ML USEFUL</span>
+              <h2>Understand behavior across sessions, not isolated messages.</h2>
               <p>
-                API keys stay on your server. Short-lived user tokens go to the client. Channel
-                grants and profile changes propagate to every active session.
+                Your backend establishes a stable, product-scoped identity. That lets safety models
+                connect patterns over time while raw external user IDs stay protected.
               </p>
               <ul className="check-list">
                 <li><Check /> Product-scoped identity mapping</li>
-                <li><Check /> Live grant and revoke events</li>
-                <li><Check /> Mutable display name, immutable message snapshot</li>
-                <li><Check /> Custom views without forking the SDK</li>
+                <li><Check /> Cross-session behavioral context</li>
+                <li><Check /> Specialized grooming and community models</li>
+                <li><Check /> Encrypted, review-ready evidence</li>
               </ul>
             </div>
             <div className="code-window">
@@ -214,11 +220,11 @@ Idempotency-Key: 0198…{String.fromCharCode(10, 10)}
 
         <section className="cta-section shell">
           <div>
-            <span className="kicker">BUILD THE FIRST CONVERSATION</span>
-            <h2>Test two users, one channel and your own message type.</h2>
+            <span className="kicker">START WITH REAL INFRASTRUCTURE</span>
+            <h2>See the identity, access and evidence foundation in action.</h2>
           </div>
           <Link className="button primary" to="/demo">
-            Open the live tester <ArrowRight size={17} />
+            Open the live demo <ArrowRight size={17} />
           </Link>
         </section>
       </main>
