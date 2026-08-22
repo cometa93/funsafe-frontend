@@ -1,0 +1,477 @@
+{
+  "asyncapi": "3.0.0",
+  "info": {
+    "title": "SafeFun Chat Gateway",
+    "version": "1.0.0",
+    "description": "Authenticated realtime chat with live channel access, custom message metadata and reporting."
+  },
+  "servers": {
+    "production": { "host": "chat.safe.funventure.eu", "protocol": "wss", "pathname": "/chat/v1" }
+  },
+  "channels": {
+    "chat": {
+      "address": "/chat/v1",
+      "messages": {
+        "clientPacket": { "$ref": "#/components/messages/ClientPacket" },
+        "serverPacket": { "$ref": "#/components/messages/ServerPacket" }
+      }
+    }
+  },
+  "operations": {
+    "receiveClientPacket": {
+      "action": "receive",
+      "channel": { "$ref": "#/channels/chat" },
+      "messages": [{ "$ref": "#/channels/chat/messages/clientPacket" }]
+    },
+    "sendServerPacket": {
+      "action": "send",
+      "channel": { "$ref": "#/channels/chat" },
+      "messages": [{ "$ref": "#/channels/chat/messages/serverPacket" }]
+    }
+  },
+  "components": {
+    "messages": {
+      "ClientPacket": { "payload": { "$ref": "#/components/schemas/ClientPacket" } },
+      "ServerPacket": { "payload": { "$ref": "#/components/schemas/ServerPacket" } }
+    },
+    "schemas": {
+      "ClientPacket": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "AUTH" },
+              "accessToken": { "type": "string", "minLength": 32, "maxLength": 4096 }
+            },
+            "required": ["v", "op", "accessToken"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "JOIN_CHANNEL" },
+              "channelId": { "type": "string", "minLength": 1, "maxLength": 128 }
+            },
+            "required": ["v", "op", "channelId"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "LEAVE_CHANNEL" },
+              "channelId": { "type": "string", "minLength": 1, "maxLength": 128 }
+            },
+            "required": ["v", "op", "channelId"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "CHAT_SEND" },
+              "channelId": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "clientMessageId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "messageType": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "pattern": "^[a-z0-9][a-z0-9._-]*$"
+              },
+              "text": { "default": "", "type": "string", "maxLength": 1000 },
+              "additionalData": {
+                "default": {},
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"
+                },
+                "additionalProperties": { "type": "string", "maxLength": 1024 }
+              }
+            },
+            "required": [
+              "v",
+              "op",
+              "channelId",
+              "clientMessageId",
+              "messageType",
+              "text",
+              "additionalData"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "REPORT_MESSAGE" },
+              "messageId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "spam",
+                  "harassment",
+                  "hate",
+                  "sexual-content",
+                  "self-harm",
+                  "personal-information",
+                  "other"
+                ]
+              },
+              "comment": { "type": "string", "maxLength": 500 }
+            },
+            "required": ["v", "op", "messageId", "reason"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "PING" },
+              "nonce": { "type": "string", "maxLength": 64 }
+            },
+            "required": ["v", "op"],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "ServerPacket": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "AUTHENTICATED" },
+              "userId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "sessionId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "productId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "senderName": { "type": "string" },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              }
+            },
+            "required": ["v", "op", "userId", "sessionId", "productId", "senderName", "expiresAt"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "CHANNEL_ACCESS_SNAPSHOT" },
+              "channelIds": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1, "maxLength": 128 }
+              },
+              "membershipVersion": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+            },
+            "required": ["v", "op", "channelIds", "membershipVersion"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": {
+                "type": "string",
+                "enum": ["CHANNEL_ACCESS_GRANTED", "CHANNEL_ACCESS_REVOKED"]
+              },
+              "channelId": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "membershipVersion": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+            },
+            "required": ["v", "op", "channelId", "membershipVersion"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": {
+                "type": "string",
+                "enum": ["CHANNEL_JOINED", "CHANNEL_LEFT", "CHANNEL_DELETED"]
+              },
+              "channelId": { "type": "string", "minLength": 1, "maxLength": 128 }
+            },
+            "required": ["v", "op", "channelId"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "CHAT_HISTORY" },
+              "channelId": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "messages": {
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "messageId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "clientMessageId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "channelId": { "type": "string", "minLength": 1, "maxLength": 128 },
+                    "messageType": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 64,
+                      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                    },
+                    "text": { "type": "string", "maxLength": 1000 },
+                    "additionalData": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64,
+                        "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"
+                      },
+                      "additionalProperties": { "type": "string", "maxLength": 1024 }
+                    },
+                    "userId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "senderName": { "type": "string", "minLength": 1, "maxLength": 80 },
+                    "sentAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                    }
+                  },
+                  "required": [
+                    "messageId",
+                    "clientMessageId",
+                    "channelId",
+                    "messageType",
+                    "text",
+                    "additionalData",
+                    "userId",
+                    "senderName",
+                    "sentAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": ["v", "op", "channelId", "messages"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "CHAT_MESSAGE" },
+              "message": {
+                "type": "object",
+                "properties": {
+                  "messageId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "clientMessageId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "channelId": { "type": "string", "minLength": 1, "maxLength": 128 },
+                  "messageType": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[a-z0-9][a-z0-9._-]*$"
+                  },
+                  "text": { "type": "string", "maxLength": 1000 },
+                  "additionalData": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 64,
+                      "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"
+                    },
+                    "additionalProperties": { "type": "string", "maxLength": 1024 }
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "senderName": { "type": "string", "minLength": 1, "maxLength": 80 },
+                  "sentAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                  }
+                },
+                "required": [
+                  "messageId",
+                  "clientMessageId",
+                  "channelId",
+                  "messageType",
+                  "text",
+                  "additionalData",
+                  "userId",
+                  "senderName",
+                  "sentAt"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": ["v", "op", "message"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "CHAT_ACCEPTED" },
+              "clientMessageId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "messageId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              }
+            },
+            "required": ["v", "op", "clientMessageId", "messageId"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "MESSAGE_REPORTED" },
+              "messageId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "safetyCaseId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              }
+            },
+            "required": ["v", "op", "messageId", "safetyCaseId"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "USER_UPDATED" },
+              "userId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "senderName": { "type": "string" },
+              "profileVersion": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+            },
+            "required": ["v", "op", "userId", "senderName", "profileVersion"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "SESSION_REVOKED" },
+              "reason": {
+                "type": "string",
+                "enum": ["session-ended", "feature-disabled", "api-key-revoked"]
+              }
+            },
+            "required": ["v", "op", "reason"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "PONG" },
+              "nonce": { "type": "string", "maxLength": 64 }
+            },
+            "required": ["v", "op"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "PROTOCOL_ERROR" },
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_PACKET",
+                  "UNSUPPORTED_FORMAT",
+                  "PAYLOAD_TOO_LARGE",
+                  "AUTH_REQUIRED",
+                  "AUTH_FAILED",
+                  "FORBIDDEN",
+                  "RATE_LIMITED",
+                  "UNKNOWN_MESSAGE_TYPE",
+                  "MESSAGE_NOT_FOUND",
+                  "REPORT_REJECTED"
+                ]
+              },
+              "message": { "type": "string" }
+            },
+            "required": ["v", "op", "code", "message"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "x-wire-formats": {
+    "default": "json",
+    "supported": ["json", "msgpack"],
+    "negotiation": "Use format=json or format=msgpack in the connection query."
+  },
+  "x-limits": {
+    "maxPacketBytes": 16384,
+    "maxTextCharacters": 1000,
+    "maxAdditionalDataBytes": 8192,
+    "maxAdditionalDataEntries": 16
+  }
+}

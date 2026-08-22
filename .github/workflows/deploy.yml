@@ -1,0 +1,79 @@
+name: Deploy production
+
+on:
+  push:
+    branches: ["release/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: startsWith(github.ref, 'refs/heads/release/')
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Validate branch version
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#release/v}"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid release branch"; exit 1; }
+          [[ "$VERSION" == "$PACKAGE_VERSION" ]] || { echo "Branch and package versions differ"; exit 1; }
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Build production frontend
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_CHAT_URL: ${{ vars.VITE_CHAT_URL }}
+          VITE_DEMO_MODE: ${{ vars.VITE_DEMO_MODE }}
+        run: |
+          [[ -n "$VITE_API_URL" && -n "$VITE_CHAT_URL" ]] || { echo "Missing public frontend variables"; exit 1; }
+          pnpm build
+          tar -czf frontend.tar.gz -C dist .
+      - name: Configure SSH
+        shell: bash
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          [[ -n "$SSH_PRIVATE_KEY" && -n "$SSH_KNOWN_HOSTS" ]] || { echo "Missing deploy SSH secrets"; exit 1; }
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/deploy_key ~/.ssh/known_hosts
+      - name: Upload and activate release
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_ROOT: ${{ vars.DEPLOY_ROOT }}
+          RELEASE_ROOT: ${{ vars.RELEASE_ROOT }}
+        run: |
+          required=(DEPLOY_HOST DEPLOY_PORT DEPLOY_USER DEPLOY_ROOT RELEASE_ROOT)
+          for name in "${required[@]}"; do
+            [[ -n "${!name:-}" ]] || { echo "Missing deploy variable: $name"; exit 1; }
+          done
+          TARGET="$DEPLOY_USER@$DEPLOY_HOST"
+          SSH=(ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" -o BatchMode=yes "$TARGET")
+          SCP=(scp -i ~/.ssh/deploy_key -P "$DEPLOY_PORT" -o BatchMode=yes)
+          REMOTE_INCOMING="$RELEASE_ROOT/incoming/$VERSION"
+          "${SSH[@]}" "mkdir -p '$REMOTE_INCOMING'"
+          "${SCP[@]}" frontend.tar.gz deploy/mydevil/deploy-release.sh "$TARGET:$REMOTE_INCOMING/"
+          "${SSH[@]}" "bash '$REMOTE_INCOMING/deploy-release.sh' '$VERSION' '$DEPLOY_ROOT' '$RELEASE_ROOT'"
+      - name: Verify public site
+        run: curl --fail --retry 5 --retry-delay 3 "${{ vars.PUBLIC_SITE_URL }}"
