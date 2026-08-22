@@ -52,9 +52,9 @@ export function LandingPage() {
         <section className="hero shell">
           <div className="hero-copy">
             <div className="eyebrow"><span className="pulse" /> AI-driven safety for games & apps</div>
-            <h1>Safe for margins.<span>Built for scale.</span></h1>
+            <h1>Safe for margin.<span>Built for scale.</span></h1>
             <p>
-              One API for realtime chat, Children Safety and Community Safety—with specialized
+              One API for realtime chat, Children Safety and Community Safety, with specialized
               models and review-ready context designed for products that grow without making
               protection an afterthought.
             </p>
