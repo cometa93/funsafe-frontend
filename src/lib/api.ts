@@ -43,6 +43,14 @@ export interface SessionResult {
   sessionExpiresAt: string;
 }
 
+export interface PublicDemoResult {
+  channelId: string;
+  participants: {
+    alice: SessionResult;
+    bob: SessionResult;
+  };
+}
+
 export interface ChatMessage {
   messageId: string;
   clientMessageId: string;
@@ -166,4 +174,12 @@ export const dashboardApi = {
     api<ActiveSessionSummary[]>(`/api/v1/dashboard/products/${productId}/sessions`),
   revokeSession: (productId: string, sessionId: string) =>
     api(`/api/v1/dashboard/products/${productId}/sessions/${sessionId}`, { method: 'DELETE' })
+};
+
+export const publicDemoApi = {
+  start: (visitorId: string) =>
+    api<PublicDemoResult>('/api/v1/demo/chat', {
+      method: 'POST',
+      body: JSON.stringify({ visitorId })
+    })
 };

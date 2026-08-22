@@ -22,7 +22,7 @@ export const safeFunUpdates: NewsItem[] = [
     title: 'SafeFun Chat MVP is live',
     summary:
       'The first release combines product-scoped users, private channels, realtime access changes, custom message metadata and safety reporting in one working tester.',
-    href: '/dashboard',
+    href: '/demo',
     readMore: 'Open the Chat Tester'
   },
   {

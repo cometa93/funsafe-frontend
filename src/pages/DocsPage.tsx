@@ -52,7 +52,7 @@ export function DocsPage() {
         <section id="custom-views"><h2>Custom message views</h2><p>Register a prefab by <code>messageType</code>. The prefab implements <code>IChatMessageView</code>; no SDK switch statement needs changing.</p></section>
         <section id="reports"><h2>Reports and preserved evidence</h2><p>A valid report preserves the reported message and the author’s available 24-hour context for 90 days. Evidence content is encrypted at rest and the reporter is hidden from the reported user.</p></section>
       </main>
-      <aside className="docs-toc"><small>ON THIS PAGE</small><a href="#architecture">Architecture</a><a href="#session">Create a session</a><a href="#websocket">Realtime protocol</a><a href="#unity">Unity</a><a href="#reports">Reports</a><div><MessageSquareText /><strong>Need to see it live?</strong><Link to="/dashboard">Open Chat Tester</Link></div></aside>
+      <aside className="docs-toc"><small>ON THIS PAGE</small><a href="#architecture">Architecture</a><a href="#session">Create a session</a><a href="#websocket">Realtime protocol</a><a href="#unity">Unity</a><a href="#reports">Reports</a><div><MessageSquareText /><strong>Need to see it live?</strong><Link to="/demo">Open Chat Tester</Link></div></aside>
     </div>
   );
 }

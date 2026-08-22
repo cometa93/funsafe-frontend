@@ -45,7 +45,7 @@ export function LandingPage() {
         </nav>
         <div className="nav-actions">
           <Link className="button ghost" to="/auth">Sign in</Link>
-          <Link className="button primary small" to="/dashboard">
+          <Link className="button primary small" to="/demo">
             Open tester <ArrowRight size={15} />
           </Link>
         </div>
@@ -62,7 +62,7 @@ export function LandingPage() {
               protection an afterthought.
             </p>
             <div className="hero-actions">
-              <Link className="button primary" to="/dashboard">
+              <Link className="button primary" to="/demo">
                 Launch Chat Tester <ArrowRight size={17} />
               </Link>
               <Link className="button secondary" to="/docs">Read the API docs</Link>
@@ -217,7 +217,7 @@ Idempotency-Key: 0198…{String.fromCharCode(10, 10)}
             <span className="kicker">BUILD THE FIRST CONVERSATION</span>
             <h2>Test two users, one channel and your own message type.</h2>
           </div>
-          <Link className="button primary" to="/dashboard">
+          <Link className="button primary" to="/demo">
             Open the live tester <ArrowRight size={17} />
           </Link>
         </section>

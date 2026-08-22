@@ -48,7 +48,7 @@ export function NewsPage() {
         </nav>
         <div className="nav-actions">
           <Link className="button ghost" to="/auth">Sign in</Link>
-          <Link className="button primary small" to="/dashboard">
+          <Link className="button primary small" to="/demo">
             Open tester <ArrowRight size={15} />
           </Link>
         </div>
