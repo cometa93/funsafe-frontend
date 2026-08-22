@@ -90,6 +90,34 @@ export interface ActiveSessionSummary {
   expiresAt: string;
 }
 
+export interface ModerationScores {
+  hate: number;
+  harassment: number;
+  contextFree: number;
+  trustBuilding: number;
+}
+
+export interface SafetyCaseSummary {
+  id: string;
+  productId: string;
+  messageId: string;
+  reportedUserId: string;
+  reason: string;
+  category: 'user_report' | 'hate' | 'harassment' | 'context_free' | 'grooming_context';
+  source: 'user_report' | 'automated';
+  severity: 'medium' | 'high' | 'critical';
+  moderation: {
+    scores: ModerationScores;
+    previousAverages: ModerationScores;
+    conversationAverages: ModerationScores;
+    sampleCount: number;
+    model: string;
+  } | null;
+  createdAt: string;
+  expiresAt: string;
+  status: 'open' | 'closed';
+}
+
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body !== undefined) headers.set('content-type', 'application/json');
@@ -170,7 +198,7 @@ export const dashboardApi = {
       { method: 'PATCH', body: JSON.stringify({ senderName }) }
     ),
   safetyCases: (productId: string) =>
-    api<Record<string, unknown>[]>(
+    api<SafetyCaseSummary[]>(
       `/api/v1/dashboard/products/${productId}/safety-cases`
     ),
   users: (productId: string) =>

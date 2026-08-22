@@ -1,3 +1,8 @@
+AuthType Basic
+AuthName "SafeFun Private Preview"
+AuthUserFile /usr/home/funventure/.config/safefun/site.htpasswd
+Require valid-user
+
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

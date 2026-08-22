@@ -232,9 +232,29 @@ function SafetyCases({ product }: { product: Product }) {
   const cases = useQuery({ queryKey: ['safety', product.id], queryFn: () => dashboardApi.safetyCases(product.id) });
   return (
     <section className="dashboard-content narrow">
-      <div className="panel-heading"><div><span className="kicker">PRESERVED CONTEXT</span><h2>Safety cases</h2><p>Reporter identity is hidden from the reported user. Evidence content remains encrypted at rest.</p></div></div>
-      {!cases.data?.length ? <div className="empty-list"><ShieldAlert /><h3>No safety cases</h3><p>Reports created in Chat Tester will appear here.</p></div> :
-        <div className="table-card">{cases.data.map((item, index) => <div className="case-row" key={String(item.id)}><span>SF-{String(index + 1).padStart(4, '0')}</span><strong>{String(item.reason)}</strong><code>{String(item.messageId)}</code><em className="warning">Open</em></div>)}</div>}
+      <div className="panel-heading"><div><span className="kicker">PRESERVED CONTEXT</span><h2>Safety cases</h2><p>Hate, harassment and immediately harmful content are scored independently. Trust-building risk uses the previous conversation average. Evidence remains encrypted at rest.</p></div></div>
+      {!cases.data?.length ? <div className="empty-list"><ShieldAlert /><h3>No safety cases</h3><p>User reports and automated moderation cases will appear here.</p></div> :
+        <div className="case-list">{cases.data.map((item, index) => (
+          <article className={`moderation-case ${item.severity}`} key={item.id}>
+            <header>
+              <span>SF-{String(index + 1).padStart(4, '0')}</span>
+              <strong>{item.category.replaceAll('_', ' ')}</strong>
+              <small>{item.source === 'automated' ? 'AI moderation' : 'User report'}</small>
+              <em>{item.severity}</em>
+            </header>
+            <h3>{item.reason}</h3>
+            {item.moderation && <>
+              <div className="case-score-grid">
+                <span><small>HATE</small><strong>{Math.round(item.moderation.scores.hate * 100)}%</strong></span>
+                <span><small>HARASSMENT</small><strong>{Math.round(item.moderation.scores.harassment * 100)}%</strong></span>
+                <span><small>NO CONTEXT</small><strong>{Math.round(item.moderation.scores.contextFree * 100)}%</strong></span>
+                <span><small>TRUST BUILDING</small><strong>{Math.round(item.moderation.scores.trustBuilding * 100)}%</strong></span>
+              </div>
+              <p>Previous trust average: <strong>{Math.round(item.moderation.previousAverages.trustBuilding * 100)}%</strong> · Conversation average: <strong>{Math.round(item.moderation.conversationAverages.trustBuilding * 100)}%</strong> · {item.moderation.sampleCount} scored messages</p>
+            </>}
+            <footer><code>{item.messageId}</code><span>{new Date(item.createdAt).toLocaleString()}</span></footer>
+          </article>
+        ))}</div>}
     </section>
   );
 }

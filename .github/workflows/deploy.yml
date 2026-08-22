@@ -44,6 +44,15 @@ jobs:
           [[ -n "$VITE_API_URL" && -n "$VITE_CHAT_URL" ]] || { echo "Missing public frontend variables"; exit 1; }
           pnpm build
           tar -czf frontend.tar.gz -C dist .
+      - name: Create private preview credentials
+        shell: bash
+        env:
+          SITE_ACCESS_PASSWORD: ${{ secrets.SITE_ACCESS_PASSWORD }}
+        run: |
+          [[ -n "$SITE_ACCESS_PASSWORD" ]] || { echo "Missing SITE_ACCESS_PASSWORD"; exit 1; }
+          umask 077
+          PASSWORD_HASH="$(printf '%s' "$SITE_ACCESS_PASSWORD" | openssl passwd -apr1 -stdin)"
+          printf 'preview:%s\n' "$PASSWORD_HASH" > site.htpasswd
       - name: Configure SSH
         shell: bash
         env:
@@ -73,8 +82,10 @@ jobs:
           SCP=(scp -i ~/.ssh/deploy_key -P "$DEPLOY_PORT" -o BatchMode=yes)
           REMOTE_INCOMING="$RELEASE_ROOT/incoming/$VERSION"
           "${SSH[@]}" "mkdir -p '$REMOTE_INCOMING'"
-          "${SCP[@]}" frontend.tar.gz deploy/mydevil/deploy-release.sh "$TARGET:$REMOTE_INCOMING/"
+          "${SCP[@]}" frontend.tar.gz site.htpasswd deploy/mydevil/deploy-release.sh "$TARGET:$REMOTE_INCOMING/"
           "${SSH[@]}" "bash '$REMOTE_INCOMING/deploy-release.sh' '$VERSION' '$DEPLOY_ROOT' '$RELEASE_ROOT'"
       - name: Verify public site
         if: vars.PUBLIC_DNS_READY == 'true'
-        run: curl --fail --retry 5 --retry-delay 3 "${{ vars.PUBLIC_SITE_URL }}"
+        env:
+          SITE_ACCESS_PASSWORD: ${{ secrets.SITE_ACCESS_PASSWORD }}
+        run: curl --fail --retry 5 --retry-delay 3 --user "preview:$SITE_ACCESS_PASSWORD" "${{ vars.PUBLIC_SITE_URL }}"

@@ -19,11 +19,16 @@ esac
 
 INCOMING_DIR="${RELEASE_ROOT}/incoming/${VERSION}"
 RELEASE_DIR="${RELEASE_ROOT}/releases/${VERSION}"
+CONFIG_DIR="${HOME}/.config/safefun"
+HTPASSWD_FILE="${CONFIG_DIR}/site.htpasswd"
 [ -f "${INCOMING_DIR}/frontend.tar.gz" ] || { echo "Missing frontend bundle" >&2; exit 1; }
+[ -f "${INCOMING_DIR}/site.htpasswd" ] || { echo "Missing preview credentials" >&2; exit 1; }
 [ ! -e "${RELEASE_DIR}" ] || { echo "Release ${VERSION} already exists" >&2; exit 1; }
 
-mkdir -p "${RELEASE_DIR}" "${PUBLIC_DIR}"
+mkdir -p "${RELEASE_DIR}" "${PUBLIC_DIR}" "${CONFIG_DIR}"
+install -m 600 "${INCOMING_DIR}/site.htpasswd" "${HTPASSWD_FILE}"
 tar -xzf "${INCOMING_DIR}/frontend.tar.gz" -C "${RELEASE_DIR}"
 cp -R "${RELEASE_DIR}/." "${PUBLIC_DIR}/"
+rm -f "${INCOMING_DIR}/site.htpasswd"
 printf '%s\n' "${VERSION}" > "${RELEASE_ROOT}/CURRENT_VERSION"
 echo "Frontend ${VERSION} deployed successfully"

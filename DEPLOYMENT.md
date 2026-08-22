@@ -22,6 +22,7 @@ push deploys the static build through the protected `production` environment.
 
 - `DEPLOY_SSH_PRIVATE_KEY`
 - `DEPLOY_KNOWN_HOSTS`
+- `SITE_ACCESS_PASSWORD`: password for the temporary HTTP Basic Auth user `preview`
 
 Use a dedicated deploy key whose public half is installed on MyDevil. Frontend
 variables are intentionally public and must be stored as GitHub Variables, not
