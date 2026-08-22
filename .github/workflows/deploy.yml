@@ -76,4 +76,5 @@ jobs:
           "${SCP[@]}" frontend.tar.gz deploy/mydevil/deploy-release.sh "$TARGET:$REMOTE_INCOMING/"
           "${SSH[@]}" "bash '$REMOTE_INCOMING/deploy-release.sh' '$VERSION' '$DEPLOY_ROOT' '$RELEASE_ROOT'"
       - name: Verify public site
+        if: vars.PUBLIC_DNS_READY == 'true'
         run: curl --fail --retry 5 --retry-delay 3 "${{ vars.PUBLIC_SITE_URL }}"

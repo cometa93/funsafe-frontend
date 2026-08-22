@@ -16,6 +16,7 @@ push deploys the static build through the protected `production` environment.
 - `VITE_API_URL`: `https://api.safe.funventure.eu`
 - `VITE_CHAT_URL`: `wss://chat.safe.funventure.eu/chat/v1`
 - `VITE_DEMO_MODE`: `false`
+- `PUBLIC_DNS_READY`: `false` until Route 53 records resolve, then `true`
 
 ## Production environment secrets
 
