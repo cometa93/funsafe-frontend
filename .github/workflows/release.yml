@@ -1,4 +1,5 @@
 name: Create release branch
+run-name: Create release v${{ inputs.version }}
 
 on:
   workflow_dispatch:
