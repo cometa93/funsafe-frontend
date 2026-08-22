@@ -7,13 +7,12 @@ import {
   Flag,
   KeyRound,
   Radio,
-  Scale,
   ShieldCheck,
-  ShieldAlert,
   UserRoundCheck
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Brand } from '../components/Brand';
+import { safetySignals } from '../data/news';
 
 const features = [
   {
@@ -33,57 +32,6 @@ const features = [
   }
 ];
 
-const safetySignals = [
-  {
-    source: 'The Conversation',
-    date: '20 Aug 2026',
-    label: 'REGULATORY ACTION',
-    icon: ShieldAlert,
-    title: 'Unknown adults could still reach child accounts',
-    summary:
-      'Australia\'s eSafety regulator required stronger contact controls, private-by-default child accounts, clearer reporting outcomes and independent safety audits.',
-    response:
-      'Product-scoped identity, private channels and server-authoritative grants make access an explicit decision that can be revoked in realtime.',
-    href: 'https://theconversation.com/roblox-has-been-put-on-notice-yet-again-over-child-safety-concerns-what-do-parents-need-to-know-290148'
-  },
-  {
-    source: 'BBC News',
-    date: '26 Mar 2026',
-    label: 'INDUSTRY WARNING',
-    icon: UserRoundCheck,
-    title: 'Safety tools still leave parents carrying the load',
-    summary:
-      'An independent developer told the BBC that existing controls and age checks did not go far enough, while Roblox described its safeguards and behavior monitoring.',
-    response:
-      'A stable user identity connects sessions, messages, name changes and access events so product teams can investigate behavior instead of isolated accounts.',
-    href: 'https://www.bbc.com/news/articles/c78l92e9192o'
-  },
-  {
-    source: 'The Guardian',
-    date: '14 Apr 2025',
-    label: 'INDEPENDENT RESEARCH',
-    icon: Radio,
-    title: 'Simple filters can miss context and coded behavior',
-    summary:
-      'Researchers reported that young test accounts could interact with adults, encounter suggestive environments and receive attempts to move conversations off-platform.',
-    response:
-      'Review-ready context and specialized models are designed to examine behavior across messages, sessions and reports, not just one blocked phrase.',
-    href: 'https://www.theguardian.com/technology/2025/apr/14/risks-children-roblox-deeply-disturbing-researchers'
-  },
-  {
-    source: 'Singleton Schreiber',
-    date: 'LITIGATION OVERVIEW',
-    label: 'LEGAL CLAIMS',
-    icon: Scale,
-    title: 'Reports need evidence and an accountable response',
-    summary:
-      'A law firm representing families summarizes allegations involving grooming, adult-minor messaging, moderation gaps and accounts remaining active after reports.',
-    response:
-      'Encrypted evidence preservation, author history and audited case actions help safety teams retain the context needed for review and escalation.',
-    href: 'https://www.singletonschreiber.com/practices/sexual-assault/roblox-child-sexual-abuse-lawsuit'
-  }
-];
-
 export function LandingPage() {
   return (
     <div className="landing">
@@ -91,7 +39,7 @@ export function LandingPage() {
         <Brand />
         <nav aria-label="Primary navigation">
           <a href="#product">Product</a>
-          <a href="#signals">News</a>
+          <Link to="/news">News</Link>
           <a href="#safety">Safety</a>
           <Link to="/docs">Docs</Link>
         </nav>
@@ -203,6 +151,11 @@ export function LandingPage() {
                 </a>
               </article>
             ))}
+          </div>
+          <div className="news-all-link">
+            <Link className="button secondary" to="/news">
+              Visit the SafeFun newsroom <ArrowRight size={16} />
+            </Link>
           </div>
           <p className="news-disclaimer">
             These sources concern Roblox; SafeFun is not affiliated with Roblox. Legal claims are
