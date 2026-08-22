@@ -9,7 +9,6 @@ import {
   ScanSearch,
   ShieldAlert,
   ShieldCheck,
-  UserRoundCheck,
   Workflow
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -25,8 +24,8 @@ const features = [
   },
   {
     icon: BrainCircuit,
-    title: 'Detect grooming risk with specialized AI/ML',
-    copy: 'Look beyond banned words to signals such as trust building, secrecy, boundary testing and attempts to move contact elsewhere.'
+    title: 'Use specialized models for distinct harms',
+    copy: 'Grooming, hate, targeted harassment and harmful UGC each require different signals, context and product responses.'
   },
   {
     icon: ShieldAlert,
@@ -85,7 +84,7 @@ export function LandingPage() {
           <div className="shell">
             <span>CHILD SAFETY FIRST</span>
             <b><ShieldCheck size={18} /> Children Safety</b>
-            <b><UserRoundCheck size={18} /> Safer Communities</b>
+            <b><ShieldAlert size={18} /> Hate & Harassment</b>
             <b><BrainCircuit size={18} /> AI/ML Specialized Models</b>
             <b><Layers3 size={18} /> Chat, UGC & Social Feeds</b>
           </div>
@@ -95,14 +94,19 @@ export function LandingPage() {
           <div className="shell specialized-grid">
             <div className="specialized-copy">
               <span className="kicker">SPECIALIZED SAFE MODELS</span>
-              <h2>Grooming is a pattern.<br />SAFE is built to understand it.</h2>
+              <h2>Different harms need<br />different models.</h2>
               <p>
-                One message may look harmless. SAFE is designed to examine the sequence: relationship
-                building, age targeting, secrecy, boundary testing and attempts to move a child away
-                from the protected product environment.
+                SAFE is designed as a family of specialized models. Children Safety links patterns
+                such as grooming and unwanted contact. Community Safety recognizes hate, targeted
+                harassment, coded abuse and coordinated attacks across sessions.
               </p>
+              <div className="safe-model-pills">
+                <span><ShieldCheck size={14} /><strong>SAFE Children</strong> Grooming & contact</span>
+                <span><ShieldAlert size={14} /><strong>SAFE Community</strong> Hate & harassment</span>
+                <span><Layers3 size={14} /><strong>SAFE Content</strong> UGC & Social Feed</span>
+              </div>
               <ul className="check-list">
-                <li><Check /> Child-safety patterns, not generic sentiment</li>
+                <li><Check /> Threat-specific patterns, not generic sentiment</li>
                 <li><Check /> Signals linked across identities and sessions</li>
                 <li><Check /> Product policy and human review remain in control</li>
               </ul>
