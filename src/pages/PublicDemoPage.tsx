@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import {
   ArrowLeft,
+  Activity,
+  BrainCircuit,
   Check,
   Circle,
   Copy,
@@ -10,12 +12,14 @@ import {
   Radio,
   Send,
   ShieldCheck,
+  Sparkles,
+  TrendingUp,
   UserPlus
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Brand } from '../components/Brand';
 import { useChatClient, type ChatTesterClient } from '../hooks/useChatClient';
-import { publicDemoApi } from '../lib/api';
+import { publicDemoApi, type ModerationUpdate } from '../lib/api';
 
 export function PublicDemoPage() {
   const [searchParams] = useSearchParams();
@@ -130,12 +134,107 @@ export function PublicDemoPage() {
           <span><ShieldCheck size={15} /> Real HTTPS and WebSocket endpoints</span>
           <span>Ephemeral channel: {channelId || 'created when the demo starts'}</span>
         </div>
+        <LiveSafetyMonitor
+          updates={alice.moderationUpdates.length > 0 ? alice.moderationUpdates : bob.moderationUpdates}
+        />
         <div className={isGuest ? 'tester-grid public-demo-guest' : 'tester-grid'}>
           {!isGuest && <PublicClientPanel client={alice} peer={bob} channelId={channelId} />}
           <PublicClientPanel client={bob} peer={alice} channelId={channelId} />
         </div>
       </main>
     </div>
+  );
+}
+
+const signalLabels: Record<string, string> = {
+  off_platform: 'Off-platform move',
+  secrecy: 'Secrecy',
+  age_probing: 'Age probing',
+  isolation_flattery: 'Isolation or flattery',
+  gifts: 'Gifts',
+  direct_threat: 'Direct threat',
+  sexual_request: 'Sexual request',
+  identity_hate: 'Identity hate',
+  targeted_harassment: 'Targeted harassment'
+};
+
+function LiveSafetyMonitor({ updates }: { updates: ModerationUpdate[] }) {
+  const latest = updates.at(-1);
+  const perMessage = [...updates.reduce((result, update) => {
+    result.set(update.messageId, update);
+    return result;
+  }, new Map<string, ModerationUpdate>()).values()].slice(-12);
+  const trustScore = latest?.scores?.trustBuilding ?? 0;
+  const previousTrust = latest?.previousAverages?.trustBuilding ?? 0;
+  const averageTrust = latest?.conversationAverages?.trustBuilding ?? 0;
+  const status = !latest
+    ? 'Waiting for conversation'
+    : latest.stage === 'analyzing'
+      ? 'Gemini is reading the trajectory'
+      : latest.stage === 'assessed'
+        ? 'Context assessment complete'
+        : latest.heuristicScore >= 5
+          ? 'Escalation threshold reached'
+          : 'Local signals monitored';
+
+  return (
+    <section className={`live-safety-monitor ${latest?.stage ?? 'idle'}`}>
+      <header>
+        <div>
+          <span className="kicker"><Activity size={13} /> LIVE SAFETY ENGINE</span>
+          <h2>Conversation risk over time</h2>
+          <p>Every message is scored locally. Gemini reads the recent Redis context only when risk accumulates or an immediate danger signal appears.</p>
+        </div>
+        <span className="monitor-status"><i /> {status}</span>
+      </header>
+      <div className="monitor-grid">
+        <article className="heuristic-meter">
+          <div><span>LOCAL RISK ACCUMULATOR</span><strong>{latest?.heuristicScore ?? 0}<small>/10</small></strong></div>
+          <div className="meter-track"><i style={{ width: `${Math.min((latest?.heuristicScore ?? 0) * 10, 100)}%` }} /></div>
+          <small>Gemini threshold: 5</small>
+        </article>
+        <article className="context-score">
+          <BrainCircuit />
+          <div><span>TRUST-BUILDING RISK</span><strong>{Math.round(trustScore * 100)}%</strong></div>
+          <small>{latest?.groomingStage ? latest.groomingStage.replaceAll('_', ' ') : 'No grooming stage detected'}</small>
+        </article>
+        <article className="average-score">
+          <TrendingUp />
+          <div><span>CONVERSATION AVERAGE</span><strong>{Math.round(averageTrust * 100)}%</strong></div>
+          <small>Previous average {Math.round(previousTrust * 100)}% · {latest?.assessmentCount ?? 0} AI assessments</small>
+        </article>
+      </div>
+      <div className="risk-timeline">
+        <div className="timeline-heading">
+          <span>MESSAGE TRAJECTORY</span>
+          <small>{latest?.messageCount ?? 0} messages retained in the active 24h context</small>
+        </div>
+        <div className="timeline-bars">
+          {perMessage.length === 0 ? (
+            <div className="timeline-empty">Start the demo and send messages to see the risk trajectory.</div>
+          ) : perMessage.map((update, index) => {
+            const score = update.scores?.trustBuilding ?? update.heuristicScore / 10;
+            return (
+              <div className="timeline-point" key={update.messageId} title={`Message ${index + 1}: ${Math.round(score * 100)}%`}>
+                <i style={{ height: `${Math.max(score * 100, 5)}%` }} />
+                <small>{index + 1}</small>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <footer>
+        <div className="signal-list">
+          {latest?.matchedSignals.length ? latest.matchedSignals.map((signal) => (
+            <span key={signal}>{signalLabels[signal] ?? signal}</span>
+          )) : <span className="quiet">No risk signals yet</span>}
+        </div>
+        <div className={`recommended-action ${latest?.action ?? 'monitoring'}`}>
+          <Sparkles size={13} /> Action: {(latest?.action ?? 'monitoring').replaceAll('_', ' ')}
+        </div>
+      </footer>
+      <p className="monitor-hint"><strong>Try a gradual trajectory:</strong> “How old are you?” → “Keep this between us.” → “Add me on Snapchat, do not tell your parents.”</p>
+    </section>
   );
 }
 

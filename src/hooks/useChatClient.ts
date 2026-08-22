@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { CHAT_URL, type ChatMessage, type SessionResult } from '../lib/api';
+import {
+  CHAT_URL,
+  type ChatMessage,
+  type ModerationUpdate,
+  type SessionResult
+} from '../lib/api';
 
 interface WirePacket {
   v: number;
@@ -18,6 +23,7 @@ export function useChatClient(label: string) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [events, setEvents] = useState<string[]>([]);
   const [access, setAccess] = useState<string[]>([]);
+  const [moderationUpdates, setModerationUpdates] = useState<ModerationUpdate[]>([]);
 
   const log = useCallback((direction: 'in' | 'out', packet: unknown) => {
     setEvents((current) => [
@@ -39,6 +45,7 @@ export function useChatClient(label: string) {
     setSession(nextSession);
     setMessages([]);
     setEvents([]);
+    setModerationUpdates([]);
     setStatus('connecting');
     const socket = new WebSocket(`${CHAT_URL}?format=json`);
     socketRef.current = socket;
@@ -72,6 +79,19 @@ export function useChatClient(label: string) {
             ? current
             : [...current, message]
         );
+      } else if (
+        parsed.op === 'MODERATION_UPDATE' &&
+        typeof parsed.messageId === 'string' &&
+        typeof parsed.userId === 'string' &&
+        typeof parsed.heuristicScore === 'number' &&
+        (parsed.stage === 'monitoring' ||
+          parsed.stage === 'analyzing' ||
+          parsed.stage === 'assessed')
+      ) {
+        setModerationUpdates((current) => [
+          ...current,
+          parsed as unknown as ModerationUpdate
+        ].slice(-60));
       } else if (parsed.op === 'SESSION_REVOKED') {
         socket.close();
       }
@@ -95,6 +115,7 @@ export function useChatClient(label: string) {
     messages,
     events,
     access,
+    moderationUpdates,
     connect,
     disconnect,
     join: (channelId: string) => send({ op: 'JOIN_CHANNEL', channelId }),

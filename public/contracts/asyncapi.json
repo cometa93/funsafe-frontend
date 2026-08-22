@@ -380,6 +380,130 @@
             "type": "object",
             "properties": {
               "v": { "type": "number", "const": 1 },
+              "op": { "type": "string", "const": "MODERATION_UPDATE" },
+              "messageId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "productId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "channelId": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "userId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "stage": { "type": "string", "enum": ["monitoring", "analyzing", "assessed"] },
+              "heuristicScore": { "type": "number", "minimum": 0, "maximum": 10 },
+              "matchedSignals": {
+                "maxItems": 16,
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "scores": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "hate": { "type": "number", "minimum": 0, "maximum": 1 },
+                      "harassment": { "type": "number", "minimum": 0, "maximum": 1 },
+                      "contextFree": { "type": "number", "minimum": 0, "maximum": 1 },
+                      "trustBuilding": { "type": "number", "minimum": 0, "maximum": 1 }
+                    },
+                    "required": ["hate", "harassment", "contextFree", "trustBuilding"],
+                    "additionalProperties": false
+                  },
+                  { "type": "null" }
+                ]
+              },
+              "previousAverages": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "hate": { "type": "number", "minimum": 0, "maximum": 1 },
+                      "harassment": { "type": "number", "minimum": 0, "maximum": 1 },
+                      "contextFree": { "type": "number", "minimum": 0, "maximum": 1 },
+                      "trustBuilding": { "type": "number", "minimum": 0, "maximum": 1 }
+                    },
+                    "required": ["hate", "harassment", "contextFree", "trustBuilding"],
+                    "additionalProperties": false
+                  },
+                  { "type": "null" }
+                ]
+              },
+              "conversationAverages": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "hate": { "type": "number", "minimum": 0, "maximum": 1 },
+                      "harassment": { "type": "number", "minimum": 0, "maximum": 1 },
+                      "contextFree": { "type": "number", "minimum": 0, "maximum": 1 },
+                      "trustBuilding": { "type": "number", "minimum": 0, "maximum": 1 }
+                    },
+                    "required": ["hate", "harassment", "contextFree", "trustBuilding"],
+                    "additionalProperties": false
+                  },
+                  { "type": "null" }
+                ]
+              },
+              "messageCount": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+              "assessmentCount": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+              "groomingStage": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "rapport_building",
+                      "isolation_secrecy",
+                      "off_platform_migration",
+                      "boundary_testing",
+                      "coercion"
+                    ]
+                  },
+                  { "type": "null" }
+                ]
+              },
+              "action": {
+                "type": "string",
+                "enum": ["monitoring", "analyzing", "allow", "alert_moderator", "immediate_suspend"]
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              }
+            },
+            "required": [
+              "v",
+              "op",
+              "messageId",
+              "productId",
+              "channelId",
+              "userId",
+              "stage",
+              "heuristicScore",
+              "matchedSignals",
+              "scores",
+              "previousAverages",
+              "conversationAverages",
+              "messageCount",
+              "assessmentCount",
+              "groomingStage",
+              "action",
+              "updatedAt"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "v": { "type": "number", "const": 1 },
               "op": { "type": "string", "const": "MESSAGE_REPORTED" },
               "messageId": {
                 "type": "string",

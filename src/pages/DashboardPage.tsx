@@ -250,7 +250,7 @@ function SafetyCases({ product }: { product: Product }) {
                 <span><small>NO CONTEXT</small><strong>{Math.round(item.moderation.scores.contextFree * 100)}%</strong></span>
                 <span><small>TRUST BUILDING</small><strong>{Math.round(item.moderation.scores.trustBuilding * 100)}%</strong></span>
               </div>
-              <p>Previous trust average: <strong>{Math.round(item.moderation.previousAverages.trustBuilding * 100)}%</strong> · Conversation average: <strong>{Math.round(item.moderation.conversationAverages.trustBuilding * 100)}%</strong> · {item.moderation.sampleCount} scored messages</p>
+              <p>Previous trust average: <strong>{Math.round(item.moderation.previousAverages.trustBuilding * 100)}%</strong> · Conversation average: <strong>{Math.round(item.moderation.conversationAverages.trustBuilding * 100)}%</strong> · {item.moderation.sampleCount} scored messages · Stage: <strong>{item.moderation.groomingStage?.replaceAll('_', ' ') ?? 'none'}</strong> · Action: <strong>{item.moderation.recommendedAction.replaceAll('_', ' ')}</strong></p>
             </>}
             <footer><code>{item.messageId}</code><span>{new Date(item.createdAt).toLocaleString()}</span></footer>
           </article>

@@ -97,6 +97,31 @@ export interface ModerationScores {
   trustBuilding: number;
 }
 
+export type GroomingStage =
+  | 'rapport_building'
+  | 'isolation_secrecy'
+  | 'off_platform_migration'
+  | 'boundary_testing'
+  | 'coercion';
+
+export interface ModerationUpdate {
+  messageId: string;
+  productId: string;
+  channelId: string;
+  userId: string;
+  stage: 'monitoring' | 'analyzing' | 'assessed';
+  heuristicScore: number;
+  matchedSignals: string[];
+  scores: ModerationScores | null;
+  previousAverages: ModerationScores | null;
+  conversationAverages: ModerationScores | null;
+  messageCount: number;
+  assessmentCount: number;
+  groomingStage: GroomingStage | null;
+  action: 'monitoring' | 'analyzing' | 'allow' | 'alert_moderator' | 'immediate_suspend';
+  updatedAt: string;
+}
+
 export interface SafetyCaseSummary {
   id: string;
   productId: string;
@@ -112,6 +137,8 @@ export interface SafetyCaseSummary {
     conversationAverages: ModerationScores;
     sampleCount: number;
     model: string;
+    groomingStage: GroomingStage | null;
+    recommendedAction: 'allow' | 'alert_moderator' | 'immediate_suspend';
   } | null;
   createdAt: string;
   expiresAt: string;

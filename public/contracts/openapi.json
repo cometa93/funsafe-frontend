@@ -2325,14 +2325,35 @@
                                     "minimum": 0,
                                     "maximum": 9007199254740991
                                   },
-                                  "model": { "type": "string" }
+                                  "model": { "type": "string" },
+                                  "groomingStage": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "rapport_building",
+                                          "isolation_secrecy",
+                                          "off_platform_migration",
+                                          "boundary_testing",
+                                          "coercion"
+                                        ]
+                                      },
+                                      { "nullable": true, "enum": [null] }
+                                    ]
+                                  },
+                                  "recommendedAction": {
+                                    "type": "string",
+                                    "enum": ["allow", "alert_moderator", "immediate_suspend"]
+                                  }
                                 },
                                 "required": [
                                   "scores",
                                   "previousAverages",
                                   "conversationAverages",
                                   "sampleCount",
-                                  "model"
+                                  "model",
+                                  "groomingStage",
+                                  "recommendedAction"
                                 ],
                                 "additionalProperties": false
                               },
