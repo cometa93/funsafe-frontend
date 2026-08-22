@@ -160,13 +160,18 @@ const signalLabels: Record<string, string> = {
 
 function LiveSafetyMonitor({ updates }: { updates: ModerationUpdate[] }) {
   const latest = updates.at(-1);
+  const latestAssessment = [...updates].reverse().find((update) => update.stage === 'assessed');
   const perMessage = [...updates.reduce((result, update) => {
     result.set(update.messageId, update);
     return result;
   }, new Map<string, ModerationUpdate>()).values()].slice(-12);
-  const trustScore = latest?.scores?.trustBuilding ?? 0;
-  const previousTrust = latest?.previousAverages?.trustBuilding ?? 0;
-  const averageTrust = latest?.conversationAverages?.trustBuilding ?? 0;
+  const trustScore = latestAssessment?.scores?.trustBuilding ?? 0;
+  const previousTrust = latestAssessment?.previousAverages?.trustBuilding ?? 0;
+  const averageTrust = latestAssessment?.conversationAverages?.trustBuilding ?? 0;
+  const displayedAction =
+    latest?.stage === 'analyzing'
+      ? 'analyzing'
+      : (latestAssessment?.action ?? latest?.action ?? 'monitoring');
   const status = !latest
     ? 'Waiting for conversation'
     : latest.stage === 'analyzing'
@@ -196,12 +201,12 @@ function LiveSafetyMonitor({ updates }: { updates: ModerationUpdate[] }) {
         <article className="context-score">
           <BrainCircuit />
           <div><span>TRUST-BUILDING RISK</span><strong>{Math.round(trustScore * 100)}%</strong></div>
-          <small>{latest?.groomingStage ? latest.groomingStage.replaceAll('_', ' ') : 'No grooming stage detected'}</small>
+          <small>{latestAssessment?.groomingStage ? latestAssessment.groomingStage.replaceAll('_', ' ') : 'No grooming stage detected'}</small>
         </article>
         <article className="average-score">
           <TrendingUp />
           <div><span>CONVERSATION AVERAGE</span><strong>{Math.round(averageTrust * 100)}%</strong></div>
-          <small>Previous average {Math.round(previousTrust * 100)}% · {latest?.assessmentCount ?? 0} AI assessments</small>
+          <small>Previous average {Math.round(previousTrust * 100)}% · {latestAssessment?.assessmentCount ?? 0} AI assessments</small>
         </article>
       </div>
       <div className="risk-timeline">
@@ -229,8 +234,8 @@ function LiveSafetyMonitor({ updates }: { updates: ModerationUpdate[] }) {
             <span key={signal}>{signalLabels[signal] ?? signal}</span>
           )) : <span className="quiet">No risk signals yet</span>}
         </div>
-        <div className={`recommended-action ${latest?.action ?? 'monitoring'}`}>
-          <Sparkles size={13} /> Action: {(latest?.action ?? 'monitoring').replaceAll('_', ' ')}
+        <div className={`recommended-action ${displayedAction}`}>
+          <Sparkles size={13} /> Action: {displayedAction.replaceAll('_', ' ')}
         </div>
       </footer>
       <p className="monitor-hint"><strong>Try a gradual trajectory:</strong> “How old are you?” → “Keep this between us.” → “Add me on Snapchat, do not tell your parents.”</p>
