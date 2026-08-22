@@ -45,10 +45,17 @@ export interface SessionResult {
 
 export interface PublicDemoResult {
   channelId: string;
+  inviteCode: string;
+  inviteExpiresAt: string;
   participants: {
     alice: SessionResult;
     bob: SessionResult;
   };
+}
+
+export interface PublicDemoJoinResult {
+  channelId: string;
+  session: SessionResult;
 }
 
 export interface ChatMessage {
@@ -181,5 +188,10 @@ export const publicDemoApi = {
     api<PublicDemoResult>('/api/v1/demo/chat', {
       method: 'POST',
       body: JSON.stringify({ visitorId })
+    }),
+  join: (inviteCode: string) =>
+    api<PublicDemoJoinResult>('/api/v1/demo/chat/join', {
+      method: 'POST',
+      body: JSON.stringify({ inviteCode })
     })
 };

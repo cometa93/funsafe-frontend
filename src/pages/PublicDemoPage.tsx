@@ -1,16 +1,33 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { ArrowLeft, Circle, Flag, MessageSquareText, Radio, Send, ShieldCheck } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import {
+  ArrowLeft,
+  Check,
+  Circle,
+  Copy,
+  Flag,
+  Link2,
+  MessageSquareText,
+  Radio,
+  Send,
+  ShieldCheck,
+  UserPlus
+} from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Brand } from '../components/Brand';
 import { useChatClient, type ChatTesterClient } from '../hooks/useChatClient';
 import { publicDemoApi } from '../lib/api';
 
 export function PublicDemoPage() {
+  const [searchParams] = useSearchParams();
+  const inviteCode = searchParams.get('invite');
+  const isGuest = Boolean(inviteCode);
   const alice = useChatClient('Alice');
   const bob = useChatClient('Bob');
   const [visitorId] = useState(() => crypto.randomUUID());
   const [channelId, setChannelId] = useState('');
   const [starting, setStarting] = useState(false);
+  const [inviteUrl, setInviteUrl] = useState('');
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
 
   async function startDemo() {
@@ -19,6 +36,7 @@ export function PublicDemoPage() {
     try {
       const result = await publicDemoApi.start(visitorId);
       setChannelId(result.channelId);
+      setInviteUrl(`${window.location.origin}/demo?invite=${result.inviteCode}`);
       alice.connect(result.participants.alice);
       bob.connect(result.participants.bob);
     } catch (reason) {
@@ -26,6 +44,28 @@ export function PublicDemoPage() {
     } finally {
       setStarting(false);
     }
+  }
+
+  async function joinDemo() {
+    if (!inviteCode) return;
+    setStarting(true);
+    setError('');
+    try {
+      const result = await publicDemoApi.join(inviteCode);
+      setChannelId(result.channelId);
+      bob.connect(result.session);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Could not join the demo channel.');
+    } finally {
+      setStarting(false);
+    }
+  }
+
+  async function copyInvite() {
+    if (!inviteUrl) return;
+    await navigator.clipboard.writeText(inviteUrl);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2_000);
   }
 
   useEffect(() => {
@@ -48,24 +88,50 @@ export function PublicDemoPage() {
       <main className="public-demo-shell shell">
         <div className="public-demo-heading">
           <div>
-            <span className="kicker">LIVE PUBLIC DEMO</span>
-            <h1>Two users. One private channel. Real SafeFun infrastructure.</h1>
-            <p>
-              Start two isolated sessions, send a message over WSS and report it from the other
-              user. No account or API key is required for this controlled demo.
+            <span className="kicker">{isGuest ? 'CHANNEL INVITATION' : 'LIVE PUBLIC DEMO'}</span>
+            <h1>
+              {isGuest
+                ? 'You have been invited to a SafeFun demo channel.'
+                : 'Two users. One private channel. Real SafeFun infrastructure.'}
+            </h1>
+            <p>{isGuest
+              ? 'Join as Bob and chat live with the person who shared this invitation. The invite is temporary and restricted to this demo channel.'
+              : 'Start two isolated sessions, invite someone with a private link, send messages over WSS and report them. No account or API key is required.'}
             </p>
           </div>
-          <button className="button primary" disabled={starting} onClick={startDemo}>
-            <Radio size={16} /> {starting ? 'Starting secure sessions...' : 'Start live demo'}
+          <button
+            className="button primary"
+            disabled={starting || Boolean(channelId)}
+            onClick={isGuest ? joinDemo : startDemo}
+          >
+            {isGuest ? <UserPlus size={16} /> : <Radio size={16} />}
+            {starting
+              ? 'Creating secure session...'
+              : isGuest
+                ? channelId ? 'Joined' : 'Join demo channel'
+                : channelId ? 'Demo running' : 'Start live demo'}
           </button>
         </div>
         {error && <div className="form-message error">{error}</div>}
+        {inviteUrl && !isGuest && (
+          <div className="public-demo-invite">
+            <span><Link2 size={16} /> Invite another person to this channel</span>
+            <div>
+              <input aria-label="Demo invitation link" readOnly value={inviteUrl} />
+              <button className="button ghost" onClick={copyInvite}>
+                {copied ? <Check size={15} /> : <Copy size={15} />}
+                {copied ? 'Copied' : 'Copy invite link'}
+              </button>
+            </div>
+            <small>Invitation expires after 60 minutes and allows up to five joins.</small>
+          </div>
+        )}
         <div className="public-demo-status">
           <span><ShieldCheck size={15} /> Real HTTPS and WebSocket endpoints</span>
           <span>Ephemeral channel: {channelId || 'created when the demo starts'}</span>
         </div>
-        <div className="tester-grid">
-          <PublicClientPanel client={alice} peer={bob} channelId={channelId} />
+        <div className={isGuest ? 'tester-grid public-demo-guest' : 'tester-grid'}>
+          {!isGuest && <PublicClientPanel client={alice} peer={bob} channelId={channelId} />}
           <PublicClientPanel client={bob} peer={alice} channelId={channelId} />
         </div>
       </main>
