@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Brand } from '../components/Brand';
+import { SafetyScenario } from '../components/SafetyScenario';
 import { safetySignals } from '../data/news';
 
 const features = [
@@ -43,6 +44,7 @@ export function LandingPage() {
           <a href="#product">Platform</a>
           <Link to="/news">News</Link>
           <a href="#safety">Safety</a>
+          <Link to="/investors">Investors</Link>
           <Link to="/docs">Docs</Link>
         </nav>
         <div className="nav-actions">
@@ -56,71 +58,90 @@ export function LandingPage() {
       <main>
         <section className="hero shell">
           <div className="hero-copy">
-            <div className="eyebrow"><span className="pulse" /> AI/ML safety infrastructure for online communities</div>
-            <h1>Detect grooming patterns.<span>Intervene before harm escalates.</span></h1>
+            <div className="eyebrow"><span className="pulse" /> Child safety infrastructure for online communities</div>
+            <h1>Protect children in every interaction.<span>SAFE sees the context.</span></h1>
             <p>
-              SafeFun is a safety intelligence layer for games, apps and social products.
-              Specialized AI/ML models connect conversations and behavior across sessions to
-              surface grooming and community risk, preserve evidence and help teams prevent
-              dangerous behavior from escalating into harm.
+              SafeFun gives games, apps and social products a specialized safety layer built around
+              children. It connects identity, conversations and behavior across sessions so teams
+              can recognize risk earlier, act with context and preserve the evidence they need.
             </p>
             <div className="hero-actions">
               <Link className="button primary" to="/demo">
-                See the live foundation <ArrowRight size={17} />
+                See SAFE in action <ArrowRight size={17} />
               </Link>
               <Link className="button secondary" to="/docs">Read the API docs</Link>
             </div>
             <div className="hero-note">
-              <span><Check size={14} /> Children Safety</span>
-              <span><Check size={14} /> Community Safety</span>
-              <span><Check size={14} /> Built for games and apps</span>
+              <span><Check size={14} /> Context across sessions</span>
+              <span><Check size={14} /> Specialized child-safety models</span>
+              <span><Check size={14} /> Review-ready evidence</span>
             </div>
           </div>
 
-          <div className="hero-safety-engine" aria-label="SafeFun AI behavior risk engine example">
-            <div className="engine-bar">
-              <span><BrainCircuit size={14} /> BEHAVIOR RISK ENGINE</span>
-              <span className="connected"><CircleDot size={12} /> LIVE ANALYSIS</span>
-            </div>
-            <div className="engine-summary">
-              <div>
-                <small>SPECIALIZED MODEL</small>
-                <strong>Grooming pattern detection</strong>
-              </div>
-              <div className="risk-score"><span>RISK SIGNAL</span><strong>0.87</strong></div>
-            </div>
-            <div className="behavior-timeline">
-              <article>
-                <span>01</span>
-                <div><small>RELATIONSHIP SIGNAL</small><strong>Unusual trust-building frequency</strong></div>
-                <em>observed</em>
-              </article>
-              <article>
-                <span>02</span>
-                <div><small>CONTEXT SIGNAL</small><strong>Repeated secrecy cues</strong></div>
-                <em>elevated</em>
-              </article>
-              <article>
-                <span>03</span>
-                <div><small>BOUNDARY SIGNAL</small><strong>Off-platform contact attempt</strong></div>
-                <em>high risk</em>
-              </article>
-            </div>
-            <div className="engine-action">
-              <ScanSearch size={19} />
-              <span><strong>Safety review ready</strong><small>Cross-session context and evidence attached</small></span>
-              <code>ACT</code>
-            </div>
-          </div>
+          <SafetyScenario />
         </section>
 
         <section className="signal-strip">
           <div className="shell">
-            <span>SAFETY LAYER</span>
+            <span>CHILD SAFETY FIRST</span>
             <b><ShieldCheck size={18} /> Children Safety</b>
-            <b><UserRoundCheck size={18} /> Community Safety</b>
+            <b><UserRoundCheck size={18} /> Safer Communities</b>
             <b><BrainCircuit size={18} /> AI/ML Specialized Models</b>
             <b><Layers3 size={18} /> Chat, UGC & Social Feeds</b>
+          </div>
+        </section>
+
+        <section className="specialized-section" id="safety">
+          <div className="shell specialized-grid">
+            <div className="specialized-copy">
+              <span className="kicker">SPECIALIZED SAFE MODELS</span>
+              <h2>Grooming is a pattern.<br />SAFE is built to understand it.</h2>
+              <p>
+                One message may look harmless. SAFE is designed to examine the sequence: relationship
+                building, age targeting, secrecy, boundary testing and attempts to move a child away
+                from the protected product environment.
+              </p>
+              <ul className="check-list">
+                <li><Check /> Child-safety patterns, not generic sentiment</li>
+                <li><Check /> Signals linked across identities and sessions</li>
+                <li><Check /> Product policy and human review remain in control</li>
+              </ul>
+            </div>
+            <div className="hero-safety-engine" aria-label="SafeFun specialized behavior risk model example">
+              <div className="engine-bar">
+                <span><BrainCircuit size={14} /> SPECIALIZED SAFE MODEL</span>
+                <span className="connected"><CircleDot size={12} /> CONTEXT LINKED</span>
+              </div>
+              <div className="engine-summary">
+                <div>
+                  <small>CHILD SAFETY MODEL</small>
+                  <strong>Grooming pattern detection</strong>
+                </div>
+                <div className="risk-score"><span>RISK SIGNAL</span><strong>0.87</strong></div>
+              </div>
+              <div className="behavior-timeline">
+                <article>
+                  <span>01</span>
+                  <div><small>RELATIONSHIP SIGNAL</small><strong>Unusual trust-building frequency</strong></div>
+                  <em>observed</em>
+                </article>
+                <article>
+                  <span>02</span>
+                  <div><small>CONTEXT SIGNAL</small><strong>Repeated secrecy cues</strong></div>
+                  <em>elevated</em>
+                </article>
+                <article>
+                  <span>03</span>
+                  <div><small>BOUNDARY SIGNAL</small><strong>Off-platform contact attempt</strong></div>
+                  <em>high risk</em>
+                </article>
+              </div>
+              <div className="engine-action">
+                <ScanSearch size={19} />
+                <span><strong>Safety review ready</strong><small>Cross-session context and evidence attached</small></span>
+                <code>ACT</code>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -128,7 +149,7 @@ export function LandingPage() {
           <div className="news-heading">
             <div>
               <span className="kicker">WHY THIS INFRASTRUCTURE MATTERS</span>
-              <h2>Grooming is a pattern, not a keyword.</h2>
+              <h2>The child-safety need is visible now.</h2>
             </div>
             <p>
               Harm often develops across many interactions. Recent reporting and research show why
@@ -188,7 +209,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="integration-section" id="safety">
+        <section className="integration-section">
           <div className="shell integration-grid">
             <div>
               <span className="kicker">IDENTITY MAKES AI/ML USEFUL</span>
@@ -232,7 +253,7 @@ Idempotency-Key: 0198…{String.fromCharCode(10, 10)}
       <footer className="shell">
         <Brand compact />
         <p>AI-driven Children Safety and Community Safety infrastructure, built for scale.</p>
-        <div><Link to="/docs">Documentation</Link><span>© 2026 Funventure</span></div>
+        <div><Link to="/investors">Investors</Link><Link to="/docs">Documentation</Link><span>© 2026 Funventure</span></div>
       </footer>
     </div>
   );

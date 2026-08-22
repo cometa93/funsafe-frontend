@@ -47,6 +47,7 @@ export function NewsPage() {
           <Link to="/#product">Product</Link>
           <Link className="active" to="/news">News</Link>
           <Link to="/#safety">Safety</Link>
+          <Link to="/investors">Investors</Link>
           <Link to="/docs">Docs</Link>
         </nav>
         <div className="nav-actions">
@@ -99,7 +100,7 @@ export function NewsPage() {
       <footer className="shell">
         <Brand compact />
         <p>AI-driven Children Safety and Community Safety infrastructure, built for scale.</p>
-        <div><Link to="/docs">Documentation</Link><span>© 2026 Funventure</span></div>
+        <div><Link to="/investors">Investors</Link><Link to="/docs">Documentation</Link><span>© 2026 Funventure</span></div>
       </footer>
     </div>
   );
