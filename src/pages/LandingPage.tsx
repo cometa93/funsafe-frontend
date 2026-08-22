@@ -3,10 +3,13 @@ import {
   Braces,
   Check,
   CircleDot,
+  ExternalLink,
   Flag,
   KeyRound,
   Radio,
+  Scale,
   ShieldCheck,
+  ShieldAlert,
   UserRoundCheck
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -30,6 +33,57 @@ const features = [
   }
 ];
 
+const safetySignals = [
+  {
+    source: 'The Conversation',
+    date: '20 Aug 2026',
+    label: 'REGULATORY ACTION',
+    icon: ShieldAlert,
+    title: 'Unknown adults could still reach child accounts',
+    summary:
+      'Australia\'s eSafety regulator required stronger contact controls, private-by-default child accounts, clearer reporting outcomes and independent safety audits.',
+    response:
+      'Product-scoped identity, private channels and server-authoritative grants make access an explicit decision that can be revoked in realtime.',
+    href: 'https://theconversation.com/roblox-has-been-put-on-notice-yet-again-over-child-safety-concerns-what-do-parents-need-to-know-290148'
+  },
+  {
+    source: 'BBC News',
+    date: '26 Mar 2026',
+    label: 'INDUSTRY WARNING',
+    icon: UserRoundCheck,
+    title: 'Safety tools still leave parents carrying the load',
+    summary:
+      'An independent developer told the BBC that existing controls and age checks did not go far enough, while Roblox described its safeguards and behavior monitoring.',
+    response:
+      'A stable user identity connects sessions, messages, name changes and access events so product teams can investigate behavior instead of isolated accounts.',
+    href: 'https://www.bbc.com/news/articles/c78l92e9192o'
+  },
+  {
+    source: 'The Guardian',
+    date: '14 Apr 2025',
+    label: 'INDEPENDENT RESEARCH',
+    icon: Radio,
+    title: 'Simple filters can miss context and coded behavior',
+    summary:
+      'Researchers reported that young test accounts could interact with adults, encounter suggestive environments and receive attempts to move conversations off-platform.',
+    response:
+      'Review-ready context and specialized models are designed to examine behavior across messages, sessions and reports, not just one blocked phrase.',
+    href: 'https://www.theguardian.com/technology/2025/apr/14/risks-children-roblox-deeply-disturbing-researchers'
+  },
+  {
+    source: 'Singleton Schreiber',
+    date: 'LITIGATION OVERVIEW',
+    label: 'LEGAL CLAIMS',
+    icon: Scale,
+    title: 'Reports need evidence and an accountable response',
+    summary:
+      'A law firm representing families summarizes allegations involving grooming, adult-minor messaging, moderation gaps and accounts remaining active after reports.',
+    response:
+      'Encrypted evidence preservation, author history and audited case actions help safety teams retain the context needed for review and escalation.',
+    href: 'https://www.singletonschreiber.com/practices/sexual-assault/roblox-child-sexual-abuse-lawsuit'
+  }
+];
+
 export function LandingPage() {
   return (
     <div className="landing">
@@ -37,6 +91,7 @@ export function LandingPage() {
         <Brand />
         <nav aria-label="Primary navigation">
           <a href="#product">Product</a>
+          <a href="#signals">News</a>
           <a href="#safety">Safety</a>
           <Link to="/docs">Docs</Link>
         </nav>
@@ -117,6 +172,43 @@ export function LandingPage() {
             <b><Radio size={18} /> AI-driven</b>
             <b><Braces size={18} /> Specialized Models</b>
           </div>
+        </section>
+
+        <section className="news-section shell" id="signals">
+          <div className="news-heading">
+            <div>
+              <span className="kicker">WHY THIS INFRASTRUCTURE MATTERS</span>
+              <h2>The safety gap is already visible.</h2>
+            </div>
+            <p>
+              Recent reporting, research and legal claims show where identity, access, moderation
+              and evidence can break down as online communities grow.
+            </p>
+          </div>
+          <div className="news-grid">
+            {safetySignals.map(({ source, date, label, icon: Icon, title, summary, response, href }) => (
+              <article key={href}>
+                <header>
+                  <span><Icon size={15} /> {label}</span>
+                  <time>{date}</time>
+                </header>
+                <h3>{title}</h3>
+                <p>{summary}</p>
+                <div className="news-response">
+                  <small>SAFEFUN DESIGN RESPONSE</small>
+                  <p>{response}</p>
+                </div>
+                <a href={href} target="_blank" rel="noreferrer">
+                  Read at {source} <ExternalLink size={13} />
+                </a>
+              </article>
+            ))}
+          </div>
+          <p className="news-disclaimer">
+            These sources concern Roblox; SafeFun is not affiliated with Roblox. Legal claims are
+            allegations unless established by a court. Safety infrastructure can reduce blind
+            spots, but it does not guarantee prevention of harm or regulatory compliance.
+          </p>
         </section>
 
         <section className="product-section shell" id="product">
